@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: smart-hostel
+    runtime: node
+    buildCommand: npm install && npm run seed
+    startCommand: npm run deploy
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false

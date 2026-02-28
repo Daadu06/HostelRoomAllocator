@@ -5,6 +5,7 @@
   "main": "start.js",
   "scripts": {
     "start": "node start.js",
+    "deploy": "node server-combined.js",
     "student": "node server-student.js",
     "admin": "node server-admin.js",
     "seed": "node db/seed.js"
