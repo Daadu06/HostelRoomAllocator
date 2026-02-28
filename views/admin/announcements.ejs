@@ -1,0 +1,192 @@
+<%- include('partials/sidebar') %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Announcements - Smart Hostel</title>
+        <link rel="stylesheet" href="/css/style.css">
+        <style>
+            .announcement-card {
+                background: white;
+                border-radius: var(--radius-lg);
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--slate-200);
+            }
+
+            .announcement-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 1rem;
+            }
+
+            .announcement-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--slate-900);
+                margin: 0 0 0.25rem 0;
+            }
+
+            .announcement-meta {
+                font-size: 0.8rem;
+                color: var(--slate-500);
+            }
+
+            .announcement-body {
+                font-size: 0.95rem;
+                color: var(--slate-700);
+                line-height: 1.6;
+                white-space: pre-wrap;
+                border-top: 1px dashed var(--slate-200);
+                padding-top: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .form-panel {
+                background: white;
+                padding: 1.5rem;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-card);
+                margin-bottom: 2rem;
+                border: 1px solid var(--slate-200);
+            }
+
+            .announcements-scroll-container {
+                max-height: 500px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 0.5rem;
+            }
+
+            .announcements-scroll-container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .announcements-scroll-container::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .announcements-scroll-container::-webkit-scrollbar-thumb {
+                background-color: var(--slate-300, #cbd5e1);
+                border-radius: 10px;
+            }
+
+            .announcements-scroll-container::-webkit-scrollbar-thumb:hover {
+                background-color: var(--slate-400, #94a3b8);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="app-layout">
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <div class="content-header">
+                    <div>
+                        <h1>Broadcast Announcements</h1>
+                        <div class="header-subtitle">Send one-way messages to all students</div>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <% if (success) { %>
+                        <div class="alert alert-success">
+                            <%= success %>
+                        </div>
+                        <% } %>
+                            <% if (error) { %>
+                                <div class="alert alert-danger">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+
+                                    <div class="form-panel">
+                                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--slate-800);">
+                                            Create New Announcement</h3>
+                                        <form action="/admin/announcements" method="POST">
+                                            <div class="form-group">
+                                                <label class="form-label">Title</label>
+                                                <input type="text" name="title" class="form-control" required
+                                                    placeholder="Announcement title">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Priority</label>
+                                                <select name="priority" class="form-control" required>
+                                                    <option value="Normal">Normal</option>
+                                                    <option value="Important">Important</option>
+                                                    <option value="Urgent">Urgent</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Message Content</label>
+                                                <textarea name="message_content" class="form-control" rows="4" required
+                                                    placeholder="Type the message to broadcast..."></textarea>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <button type="submit" class="btn btn-primary">Broadcast to All
+                                                    Students</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="announcements-list">
+                                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--slate-800);">
+                                            Previous Announcements</h3>
+                                        <div class="announcements-scroll-container">
+                                            <% if (announcements.length===0) { %>
+                                                <div
+                                                    style="padding:2rem; text-align:center; color:var(--slate-500); background:white; border-radius:var(--radius-lg); border:1px dashed var(--slate-300);">
+                                                    No announcements have been broadcasted yet.
+                                                </div>
+                                                <% } else { %>
+                                                    <% announcements.forEach(a=> { %>
+                                                        <div class="announcement-card">
+                                                            <div class="announcement-header">
+                                                                <div>
+                                                                    <h4 class="announcement-title">
+                                                                        <%= a.title %>
+                                                                    </h4>
+                                                                    <div class="announcement-meta">
+                                                                        Posted by <%= a.admin_name || 'Admin' %> •
+                                                                            <% const d=new Date(a.created_at + 'Z' );
+                                                                                const
+                                                                                formattedDate=d.toLocaleString('en-IN',
+                                                                                { timeZone: 'Asia/Kolkata' ,
+                                                                                day: '2-digit' , month: '2-digit' ,
+                                                                                year: 'numeric' , hour: 'numeric' ,
+                                                                                minute: '2-digit' , hour12: true
+                                                                                }).toUpperCase(); %>
+                                                                                <%= formattedDate %>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <% if (a.priority==='Urgent' ) { %>
+                                                                        <span class="badge badge-danger">Urgent</span>
+                                                                        <% } else if (a.priority==='Important' ) { %>
+                                                                            <span
+                                                                                class="badge badge-warning">Important</span>
+                                                                            <% } else { %>
+                                                                                <span class="badge badge-info"
+                                                                                    style="background:var(--primary-100); color:var(--primary-800);">Normal</span>
+                                                                                <% } %>
+                                                                </div>
+                                                            </div>
+                                                            <div class="announcement-body">
+                                                                <%= a.message_content %>
+                                                            </div>
+                                                        </div>
+                                                        <% }) %>
+                                                            <% } %>
+                                        </div>
+                                    </div>
+
+                </div>
+            </main>
+        </div>
+    </body>
+
+    </html>

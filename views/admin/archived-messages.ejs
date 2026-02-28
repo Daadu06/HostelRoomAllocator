@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archived Messages - Admin Panel</title>
+    <meta name="description" content="Secure archive of automatically deleted messages.">
+    <link rel="stylesheet" href="/css/style.css?v=5">
+</head>
+
+<body>
+    <div class="app-layout">
+        <%- include('partials/sidebar') %>
+            <main class="main-content">
+                <div class="content-header" style="flex-wrap:wrap;gap:1.5rem;">
+                    <div>
+                        <h1>Archived Messages</h1>
+                        <div class="header-subtitle"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                            </svg> Secure, immutable record of expired auto-deleted messages.</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card" style="margin-bottom:1.5rem;">
+                    <div class="card-body">
+                        <form method="GET" action="/admin/archived-messages"
+                            style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                            <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
+                                <label class="form-label">Search Message</label>
+                                <input type="text" name="search" class="form-control"
+                                    placeholder="Search by exact phrase..." value="<%= filters.search %>">
+                            </div>
+                            <div class="form-group" style="flex:1;min-width:150px;margin-bottom:0;">
+                                <label class="form-label">Student Name</label>
+                                <input type="text" name="student" class="form-control" placeholder="e.g. John Doe"
+                                    value="<%= filters.student %>">
+                            </div>
+                            <div class="form-group" style="flex:1;min-width:120px;margin-bottom:0;">
+                                <label class="form-label">Room</label>
+                                <input type="text" name="room" class="form-control" placeholder="e.g. A-101"
+                                    value="<%= filters.room %>">
+                            </div>
+                            <div style="display:flex;gap:0.5rem;">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <a href="/admin/archived-messages" class="btn btn-outline">Clear</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:2rem;">
+                    <div class="card-header"
+                        style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--slate-100);padding-bottom:1.25rem;margin-bottom:0;">
+                        <h3 style="font-size:1.1rem;font-weight:600;color:var(--slate-800);margin:0;">Archive Logs</h3>
+                        <span class="badge badge-outline">
+                            <%= archivedMessages.length %> results
+                        </span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th>Original Date (UTC)</th>
+                                    <th>Sender</th>
+                                    <th>Room</th>
+                                    <th>Message Snippet</th>
+                                    <th>Archival Reason</th>
+                                    <th>Archive Triggered At (UTC)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (archivedMessages.length===0) { %>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:3rem;color:var(--slate-400);">
+                                            No archived messages match your criteria.</td>
+                                    </tr>
+                                    <% } else { %>
+                                        <% for(const msg of archivedMessages) { %>
+                                            <tr>
+                                                <td style="white-space:nowrap;font-size:0.85rem;">
+                                                    <div style="color:var(--slate-700);font-weight:500;">
+                                                        <%= new Date(msg.created_at + 'Z' ).toLocaleDateString('en-IN',
+                                                            { timeZone: 'UTC' , day: '2-digit' , month: 'short' ,
+                                                            year: 'numeric' }) %>
+                                                    </div>
+                                                    <div
+                                                        style="color:var(--slate-400);font-size:0.75rem;margin-top:0.25rem;">
+                                                        <%= new Date(msg.created_at + 'Z' ).toLocaleTimeString('en-IN',
+                                                            { timeZone: 'UTC' , hour: 'numeric' , minute: '2-digit' ,
+                                                            hour12: true }) %> (UTC)
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        style="font-weight:500;color:var(--slate-800);font-size:0.9rem;">
+                                                        <%= msg.sender_name %>
+                                                    </div>
+                                                    <div
+                                                        style="font-size:0.75rem;color:var(--slate-500);margin-top:0.35rem;letter-spacing:0.02em;">
+                                                        <%= msg.student_id %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-info">
+                                                        <%= msg.room_number || 'Unallocated' %>
+                                                    </span>
+                                                </td>
+                                                <td style="max-width:320px;">
+                                                    <div class="text-truncate"
+                                                        style="font-size:0.88rem;color:var(--slate-700);"
+                                                        title="<%= msg.message_text %>">
+                                                        <%= msg.message_text %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-outline" style="font-size:0.75rem;">
+                                                        <%= msg.reason %>
+                                                    </span>
+                                                </td>
+                                                <td style="white-space:nowrap;font-size:0.85rem;">
+                                                    <div style="color:var(--slate-700);font-weight:500;">
+                                                        <%= new Date(msg.archived_at + 'Z' ).toLocaleDateString('en-IN',
+                                                            { timeZone: 'UTC' , day: '2-digit' , month: 'short' ,
+                                                            year: 'numeric' }) %>
+                                                    </div>
+                                                    <div
+                                                        style="color:var(--slate-400);font-size:0.75rem;margin-top:0.25rem;">
+                                                        <%= new Date(msg.archived_at + 'Z' ).toLocaleTimeString('en-IN',
+                                                            { timeZone: 'UTC' , hour: 'numeric' , minute: '2-digit' ,
+                                                            hour12: true }) %> (UTC)
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+    </div>
+</body>
+
+</html>

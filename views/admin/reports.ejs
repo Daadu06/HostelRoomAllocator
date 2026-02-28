@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css?v=4">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <%- include('partials/sidebar') %>
+
+            <main class="main-content">
+                <div class="content-header">
+                    <div>
+                        <h1>Reports & Analytics</h1>
+                        <div class="header-subtitle">Detailed reports and data exports</div>
+                    </div>
+                    <div class="content-header-actions">
+                        <a href="/admin/export" class="btn btn-primary btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Export CSV
+                        </a>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <!-- Key Metrics -->
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Total Students</div>
+                                    <div class="stat-value">
+                                        <%= stats.totalStudents %>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Allocation Rate</div>
+                                    <div class="stat-value">
+                                        <%= stats.totalStudents> 0 ? Math.round((stats.allocatedStudents /
+                                            stats.totalStudents) * 100) : 0 %>%
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                        <polyline points="17 6 23 6 23 12" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Avg Compatibility</div>
+                                    <div class="stat-value">
+                                        <%= stats.avgCompatibility %>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card indigo">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Occupancy Rate</div>
+                                    <div class="stat-value">
+                                        <%= stats.occupancyRate %>%
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10" />
+                                        <line x1="12" y1="20" x2="12" y2="4" />
+                                        <line x1="6" y1="20" x2="6" y2="14" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Department Distribution</h3>
+                            </div>
+                            <div class="card-body"><canvas id="deptChart" height="220"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Allocation Status</h3>
+                            </div>
+                            <div class="card-body"><canvas id="allocChart" height="220"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top:1.5rem;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Room Occupancy</h3>
+                            </div>
+                            <div class="card-body"><canvas id="roomOccChart" height="220"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Year Distribution</h3>
+                            </div>
+                            <div class="card-body"><canvas id="yearChart" height="220"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Allocation Table -->
+                    <div class="card" style="margin-top:1.5rem;">
+                        <div class="card-header">
+                            <h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-4px;">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                </svg>
+                                Allocation Report
+                            </h3>
+                            <span class="badge badge-primary">
+                                <%= allocations.length %> records
+                            </span>
+                        </div>
+                        <% if (allocations.length> 0) { %>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Room</th>
+                                            <th>Student ID</th>
+                                            <th>Full Name</th>
+                                            <th>Department</th>
+                                            <th>Compatibility</th>
+                                            <th>Allocated At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% allocations.forEach(function(a) { %>
+                                            <tr>
+                                                <td><strong>
+                                                        <%= a.room_number %>
+                                                    </strong></td>
+                                                <td>
+                                                    <%= a.student_id %>
+                                                </td>
+                                                <td>
+                                                    <%= a.full_name %>
+                                                </td>
+                                                <td>
+                                                    <%= a.department %>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge <%= a.compatibility_score >= 7 ? 'badge-success' : a.compatibility_score >= 4 ? 'badge-warning' : 'badge-danger' %>">
+                                                        <%= a.compatibility_score !=null ?
+                                                            a.compatibility_score.toFixed(1) : '0.0' %>
+                                                    </span>
+                                                </td>
+                                                <td class="text-sm text-muted">
+                                                    <%= new Date(a.allocated_at).toLocaleDateString('en-IN',
+                                                        {day:'numeric', month:'short', year:'numeric'}) %>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <% } else { %>
+                                <div class="card-body">
+                                    <div class="empty-state">
+                                        <h4>No allocations yet</h4>
+                                        <p>Run the allocation algorithm first to generate report data.</p>
+                                    </div>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+            </main>
+    </div>
+
+    <script>
+        const deptData = <% - JSON.stringify(departments) %>;
+        const roomData = <% - JSON.stringify(rooms) %>;
+        const yearData = <% - JSON.stringify(yearDistribution) %>;
+
+        /* Department chart */
+        if (deptData.length > 0) {
+            new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: deptData.map(d => d.department),
+                    datasets: [{
+                        label: 'Students', data: deptData.map(d => d.count),
+                        backgroundColor: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff', '#8b5cf6'],
+                        borderRadius: 8, borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true, plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        /* Allocation doughnut */
+        new Chart(document.getElementById('allocChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Allocated', 'Pending'],
+                datasets: [{
+                    data: [<%= stats.allocatedStudents %>, <%= stats.pendingStudents %>],
+                    backgroundColor: ['#22c55e', '#f59e0b'], borderWidth: 0, hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true, cutout: '65%',
+                plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } }
+            }
+        });
+
+        /* Room occupancy */
+        if (roomData.length > 0) {
+            new Chart(document.getElementById('roomOccChart'), {
+                type: 'bar',
+                data: {
+                    labels: roomData.map(r => r.room_number),
+                    datasets: [
+                        {
+                            label: 'Occupied', data: roomData.map(r => r.current_occupancy),
+                            backgroundColor: '#6366f1', borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false
+                        },
+                        {
+                            label: 'Available', data: roomData.map(r => r.capacity - r.current_occupancy),
+                            backgroundColor: '#e0e7ff', borderRadius: { topLeft: 8, topRight: 8 }, borderSkipped: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } }
+                }
+            });
+        }
+
+        /* Year distribution */
+        if (yearData.length > 0) {
+            new Chart(document.getElementById('yearChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: yearData.map(y => 'Year ' + y.year),
+                    datasets: [{
+                        data: yearData.map(y => y.count),
+                        backgroundColor: ['#6366f1', '#f59e0b', '#22c55e', '#ef4444'], borderWidth: 0, hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, cutout: '60%',
+                    plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

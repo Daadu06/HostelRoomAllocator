@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outpass Management - Admin Panel</title>
+    <meta name="description" content="Manage student outpass requests.">
+    <link rel="stylesheet" href="/css/style.css?v=5">
+</head>
+
+<body>
+    <div class="app-layout">
+        <%- include('partials/sidebar') %>
+            <main class="main-content">
+                <div class="content-header">
+                    <div>
+                        <h1>Outpass Management</h1>
+                        <div class="header-subtitle">Review and manage student outpass requests</div>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <% if (success) { %>
+                        <div class="alert alert-success"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                            <%= success %>
+                        </div>
+                        <% } %>
+                            <% if (error) { %>
+                                <div class="alert alert-danger"><svg xmlns="http://www.w3.org/2000/svg" width="18"
+                                        height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="12" />
+                                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                    <%= error %>
+                                </div>
+                                <% } %>
+
+                                    <!-- Summary Stats -->
+                                    <div class="stats-grid"
+                                        style="grid-template-columns: repeat(auto-fit,minmax(180px,1fr));margin-bottom:1.5rem;">
+                                        <div class="stat-card yellow">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Pending</div>
+                                                    <div class="stat-value">
+                                                        <%= activeRequests.filter(r=> r.status === 'Pending').length %>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <polyline points="12 6 12 12 16 14" />
+                                                    </svg></div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card green">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Approved</div>
+                                                    <div class="stat-value">
+                                                        <%= activeRequests.filter(r=> r.status === 'Approved').length %>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                                    </svg></div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card red">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Rejected</div>
+                                                    <div class="stat-value">
+                                                        <%= activeRequests.filter(r=> r.status === 'Rejected').length %>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <line x1="15" y1="9" x2="9" y2="15" />
+                                                        <line x1="9" y1="9" x2="15" y2="15" />
+                                                    </svg></div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card blue">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Archived</div>
+                                                    <div class="stat-value">
+                                                        <%= archivedRequests.length %>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                                    </svg></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Active Requests -->
+                                    <div class="card" style="margin-bottom:1.5rem;">
+                                        <div class="card-header">
+                                            <h3>Active Outpass Requests</h3>
+                                        </div>
+                                        <div class="card-body" style="padding:0;">
+                                            <div class="table-container"
+                                                style="max-height:500px;overflow-y:auto;overflow-x:hidden;">
+                                                <table class="data-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Student</th>
+                                                            <th>Department</th>
+                                                            <th>Reason</th>
+                                                            <th>Out Date</th>
+                                                            <th>Return Date</th>
+                                                            <th>Status</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if (activeRequests.length===0) { %>
+                                                            <tr>
+                                                                <td colspan="7"
+                                                                    style="text-align:center;padding:2rem;color:var(--slate-400);">
+                                                                    No active outpass requests.</td>
+                                                            </tr>
+                                                            <% } else { %>
+                                                                <% for (const r of activeRequests) { %>
+                                                                    <tr>
+                                                                        <td><strong>
+                                                                                <%= r.full_name %>
+                                                                            </strong><br><small class="text-muted">
+                                                                                <%= r.student_id %>
+                                                                            </small></td>
+                                                                        <td>
+                                                                            <%= r.department %>
+                                                                        </td>
+                                                                        <td style="max-width:200px;font-size:0.85rem;">
+                                                                            <%= r.reason %>
+                                                                        </td>
+                                                                        <td><small>
+                                                                                <%= r.out_date %>
+                                                                            </small></td>
+                                                                        <td><small>
+                                                                                <%= r.return_date %>
+                                                                            </small></td>
+                                                                        <td><span
+                                                                                class="badge <%= r.status === 'Approved' ? 'badge-success' : r.status === 'Rejected' ? 'badge-danger' : 'badge-warning' %>">
+                                                                                <%= r.status %>
+                                                                            </span></td>
+                                                                        <td>
+                                                                            <% if (r.status==='Pending' ) { %>
+                                                                                <form
+                                                                                    action="/admin/outpass/<%= r.id %>/update"
+                                                                                    method="POST"
+                                                                                    style="display:flex;flex-direction:column;gap:0.375rem;">
+                                                                                    <input type="text"
+                                                                                        name="admin_remark"
+                                                                                        placeholder="Remark (optional)"
+                                                                                        class="form-control"
+                                                                                        style="font-size:0.75rem;padding:0.25rem 0.4rem;">
+                                                                                    <div
+                                                                                        style="display:flex;gap:0.25rem;">
+                                                                                        <button type="submit"
+                                                                                            name="status"
+                                                                                            value="Approved"
+                                                                                            class="btn btn-primary btn-sm"
+                                                                                            style="font-size:0.7rem;padding:0.2rem 0.5rem;">Approve</button>
+                                                                                        <button type="submit"
+                                                                                            name="status"
+                                                                                            value="Rejected"
+                                                                                            class="btn btn-outline btn-sm"
+                                                                                            style="font-size:0.7rem;padding:0.2rem 0.5rem;color:var(--error);border-color:var(--error);">Reject</button>
+                                                                                    </div>
+                                                                                </form>
+                                                                                <% } else { %>
+                                                                                    <small class="text-muted">
+                                                                                        <%= r.admin_remark || '—' %>
+                                                                                    </small>
+                                                                                    <% } %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Archived Requests -->
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3>Archived Outpass Requests</h3>
+                                            <span class="badge badge-outline">Auto-archived after 7 days</span>
+                                        </div>
+                                        <div class="card-body" style="padding:0;">
+                                            <div class="table-container"
+                                                style="max-height:500px;overflow-y:auto;overflow-x:hidden;">
+                                                <table class="data-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Student</th>
+                                                            <th>Department</th>
+                                                            <th>Reason</th>
+                                                            <th>Out Date</th>
+                                                            <th>Return Date</th>
+                                                            <th>Status</th>
+                                                            <th>Remark</th>
+                                                            <th>Archived</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if (archivedRequests.length===0) { %>
+                                                            <tr>
+                                                                <td colspan="8"
+                                                                    style="text-align:center;padding:2rem;color:var(--slate-400);">
+                                                                    No archived outpass requests yet.</td>
+                                                            </tr>
+                                                            <% } else { %>
+                                                                <% for (const a of archivedRequests) { %>
+                                                                    <tr>
+                                                                        <td><strong>
+                                                                                <%= a.full_name %>
+                                                                            </strong><br><small class="text-muted">
+                                                                                <%= a.student_id %>
+                                                                            </small></td>
+                                                                        <td>
+                                                                            <%= a.department %>
+                                                                        </td>
+                                                                        <td style="max-width:200px;font-size:0.85rem;">
+                                                                            <%= a.reason %>
+                                                                        </td>
+                                                                        <td><small>
+                                                                                <%= a.out_date %>
+                                                                            </small></td>
+                                                                        <td><small>
+                                                                                <%= a.return_date %>
+                                                                            </small></td>
+                                                                        <td><span
+                                                                                class="badge <%= a.status === 'Approved' ? 'badge-success' : a.status === 'Rejected' ? 'badge-danger' : 'badge-warning' %>">
+                                                                                <%= a.status %>
+                                                                            </span></td>
+                                                                        <td><small class="text-muted">
+                                                                                <%= a.admin_remark || '—' %>
+                                                                            </small>
+                                                                        </td>
+                                                                        <td><small>
+                                                                                <%= new Date(a.archived_at + ' UTC'
+                                                                                    ).toLocaleString('en-IN', {
+                                                                                    timeZone: 'Asia/Kolkata' }) %>
+                                                                            </small></td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                </div>
+            </main>
+    </div>
+</body>
+
+</html>

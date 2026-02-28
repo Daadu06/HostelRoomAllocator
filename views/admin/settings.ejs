@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css?v=4">
+</head>
+
+<body>
+    <div class="app-layout">
+        <%- include('partials/sidebar') %>
+
+            <main class="main-content">
+                <div class="content-header">
+                    <div>
+                        <h1>System Settings</h1>
+                        <div class="header-subtitle">Configure allocation parameters and system preferences</div>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <% if (success) { %>
+                        <div class="alert alert-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                            <%= success %>
+                        </div>
+                        <% } %>
+
+                            <div class="grid-2">
+                                <!-- Algorithm Settings -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                style="vertical-align:-4px;">
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path
+                                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                            </svg>
+                                            Algorithm Configuration
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="/admin/settings" method="POST">
+                                            <div class="form-group">
+                                                <label>Compatibility Weight — Sleep Pattern</label>
+                                                <input type="number" name="weight_sleep" class="form-control"
+                                                    value="<%= settings.weight_sleep %>" min="0" max="10" step="0.5">
+                                                <small class="text-muted">How important sleep schedule matching is
+                                                    (0–10)</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Compatibility Weight — Study Style</label>
+                                                <input type="number" name="weight_study" class="form-control"
+                                                    value="<%= settings.weight_study %>" min="0" max="10" step="0.5">
+                                                <small class="text-muted">How important study style matching is
+                                                    (0–10)</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Compatibility Weight — Noise Tolerance</label>
+                                                <input type="number" name="weight_noise" class="form-control"
+                                                    value="<%= settings.weight_noise %>" min="0" max="10" step="0.5">
+                                                <small class="text-muted">How important noise tolerance matching is
+                                                    (0–10)</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Compatibility Weight — Cleanliness</label>
+                                                <input type="number" name="weight_clean" class="form-control"
+                                                    value="<%= settings.weight_clean %>" min="0" max="10" step="0.5">
+                                                <small class="text-muted">How important cleanliness matching is
+                                                    (0–10)</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Preferred Roommate Bonus</label>
+                                                <input type="number" name="bonus_preferred" class="form-control"
+                                                    value="<%= settings.bonus_preferred %>" min="0" max="20" step="1">
+                                                <small class="text-muted">Extra compatibility points for a preferred
+                                                    roommate match</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Conflict Penalty</label>
+                                                <input type="number" name="penalty_conflict" class="form-control"
+                                                    value="<%= settings.penalty_conflict %>" min="-50" max="0" step="1">
+                                                <small class="text-muted">Negative points for students on each other's
+                                                    conflict list</small>
+                                            </div>
+                                            <div
+                                                style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1.5rem;">
+                                                <button type="submit" class="btn btn-primary">Save Settings</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- System Info -->
+                                <div>
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" style="vertical-align:-4px;">
+                                                    <circle cx="12" cy="12" r="10" />
+                                                    <line x1="12" y1="16" x2="12" y2="12" />
+                                                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                                                </svg>
+                                                System Information
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Application</span>
+                                                <span class="detail-value">Smart Hostel Allocator v1.0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Node.js</span>
+                                                <span class="detail-value">
+                                                    <%= process.version %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Database</span>
+                                                <span class="detail-value">SQLite (better-sqlite3)</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Total Students</span>
+                                                <span class="detail-value">
+                                                    <%= stats.totalStudents %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Total Rooms</span>
+                                                <span class="detail-value">
+                                                    <%= stats.totalRooms %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Allocations</span>
+                                                <span class="detail-value">
+                                                    <%= stats.allocatedStudents %> / <%= stats.totalStudents %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card" style="margin-top:1.5rem;">
+                                        <div class="card-header">
+                                            <h3>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" style="vertical-align:-4px;">
+                                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                                </svg>
+                                                Admin Account
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Logged in as</span>
+                                                <span class="detail-value">
+                                                    <%= currentUser.fullName %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Email</span>
+                                                <span class="detail-value text-muted">
+                                                    <%= currentUser.email %>
+                                                </span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Role</span>
+                                                <span class="badge badge-primary">Administrator</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+            </main>
+    </div>
+</body>
+
+</html>

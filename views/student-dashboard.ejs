@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Smart Hostel</title>
+    <meta name="description" content="Student dashboard for Smart Hostel Room Allocation System.">
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <style>
+        .announcements-scroll-container {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 0.5rem;
+        }
+
+        .announcements-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .announcements-scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .announcements-scroll-container::-webkit-scrollbar-thumb {
+            background-color: var(--slate-300, #cbd5e1);
+            border-radius: 10px;
+        }
+
+        .announcements-scroll-container::-webkit-scrollbar-thumb:hover {
+            background-color: var(--slate-400, #94a3b8);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+        <button class="mobile-toggle" onclick="toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+        </button>
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg></div>
+                    <div class="brand-text">
+                        <h2>Smart Hostel</h2><span>Student Portal</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <%= user.full_name ? user.full_name.charAt(0).toUpperCase() : 'S' %>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">
+                            <%= user.full_name %>
+                        </div>
+                        <div class="user-role">Student · <%= user.student_id %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Dashboard</div>
+                <a href="#profile-section" class="nav-item active" onclick="scrollToSection(event,'profile-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg> Profile
+                </a>
+                <a href="#allocation-section" class="nav-item" onclick="scrollToSection(event,'allocation-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg> My Room
+                </a>
+                <a href="#roommate-section" class="nav-item" onclick="scrollToSection(event,'roommate-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg> Roommates
+                </a>
+
+                <div class="nav-section-title" style="margin-top:0.75rem;">Services</div>
+                <a href="#announcements-section" class="nav-item"
+                    onclick="scrollToSection(event,'announcements-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                    </svg> Announcements
+                </a>
+                <a href="#messages-section" class="nav-item" onclick="scrollToSection(event,'messages-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg> Messages
+                </a>
+                <a href="#fee-section" class="nav-item" onclick="scrollToSection(event,'fee-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg> Fee Status
+                </a>
+                <a href="#complaints-section" class="nav-item" onclick="scrollToSection(event,'complaints-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg> Complaints
+                </a>
+                <a href="#reallocation-section" class="nav-item"
+                    onclick="scrollToSection(event,'reallocation-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="1 4 1 10 7 10" />
+                        <polyline points="23 20 23 14 17 14" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
+                    </svg> Room Change
+                </a>
+
+                <div class="nav-section-title" style="margin-top:0.75rem;">Journey</div>
+                <a href="#timeline-section" class="nav-item" onclick="scrollToSection(event,'timeline-section')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg> Timeline
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/logout" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg> Logout</a>
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+        <main class="main-content">
+
+            <!-- Top Bar with Notification Bell -->
+            <div class="content-header">
+                <div>
+                    <h1>Welcome, <%= user.full_name.split(' ')[0] %></h1>
+      <div class="header-subtitle">Your hostel dashboard</div>
+    </div>
+    <div class="content-header-actions" style="display:flex;align-items:center;gap:1rem;">
+      <!-- Notification Bell -->
+      <div class="notif-bell-wrapper" style="position:relative; z-index:1000;">
+        <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
+        <button class="btn btn-outline btn-sm" onclick="toggleNotifPanel()" id="notifBellBtn" style="position:relative;padding:0.5rem;z-index:1002;pointer-events:auto;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <% if (unreadCount > 0) { %><span class="notif-bell-badge"><%= unreadCount %></span><% } %>
+        </button>
+        <!-- Notification Dropdown -->
+        <div class="notif-dropdown" id="notifPanel" style="display:none;">
+          <div class="notif-dropdown-header">
+            <strong>Notifications</strong>
+            <% if (unreadCount > 0) { %><button class="btn-link" onclick="markNotifRead()">Mark all read</button><% } %>
+          </div>
+          <div class="notif-dropdown-body">
+            <% if (notifications.length === 0) { %>
+              <div style="padding:1.5rem;text-align:center;color:var(--slate-400);font-size:0.85rem;">No notifications</div>
+            <% } else { %>
+              <% for (const n of notifications.slice(0, 8)) { %>
+                <div class="notif-item <%= n.read_status === 0 ? ' unread' : '' %>">
+                            <div class="notif-dot"
+                                style="background:<%= n.type === 'success' ? 'var(--success)' : n.type === 'warning' ? 'var(--warning)' : n.type === 'error' ? 'var(--error)' : 'var(--info)' %>;">
+                            </div>
+                            <div class="notif-text">
+                                <div>
+                                    <%= n.message %>
+                                </div>
+                                <small>
+                                    <%= new Date(n.created_at).toLocaleDateString() %>
+                                </small>
+                            </div>
+                </div>
+                <% } %>
+                    <% } %>
+            </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="content-body">
+        <!-- Toast notifications -->
+        <% if (success) { %>
+            <div class="alert alert-success toast-alert" id="toastAlert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <%= success %>
+            </div>
+            <% } %>
+                <% if (error) { %>
+                    <div class="alert alert-danger toast-alert" id="toastAlert">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <!-- ═══════════ PROFILE SECTION ═══════════ -->
+                        <div id="profile-section" class="grid-2" style="margin-bottom:1.5rem;">
+                            <!-- Profile Card -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Profile Information</h3>
+                                    <button class="btn btn-outline btn-sm" style="position: relative; z-index: 10;"
+                                        onclick="toggleEdit('profileForm')">Edit</button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="profile-grid">
+                                        <div class="profile-item"><span class="profile-label">Full Name</span><span
+                                                class="profile-value">
+                                                <%= user.full_name %>
+                                            </span></div>
+                                        <div class="profile-item"><span class="profile-label">Student ID</span><span
+                                                class="profile-value">
+                                                <%= user.student_id %>
+                                            </span></div>
+                                        <div class="profile-item"><span class="profile-label">Department</span><span
+                                                class="profile-value">
+                                                <%= user.department %>
+                                            </span></div>
+                                        <div class="profile-item"><span class="profile-label">Year</span><span
+                                                class="profile-value">Year <%= user.year %></span></div>
+                                        <div class="profile-item"><span class="profile-label">Email</span><span
+                                                class="profile-value">
+                                                <%= user.email %>
+                                            </span></div>
+                                    </div>
+                                    <form id="profileForm" action="/student/profile" method="POST" class="edit-form"
+                                        style="display:none;margin-top:1rem;">
+                                        <div class="form-group"><label class="form-label">Year</label><select
+                                                name="year" class="form-control">
+                                                <% for(let y=1;y<=4;y++){%>
+                                                    <option value="<%=y%>" <%=user.year===y?'selected':''%>>Year <%=y%>
+                                                    </option>
+                                                    <%}%>
+                                            </select></div>
+                                        <div class="form-group"><label class="form-label">Email</label><input
+                                                type="email" name="email" value="<%= user.email %>" class="form-control"
+                                                required></div>
+                                        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Preferences Card -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Room Preferences</h3>
+                                    <% if (!preferences || !preferences.is_submitted) { %>
+                                        <button class="btn btn-outline btn-sm" style="position: relative; z-index: 10;"
+                                            onclick="toggleEdit('prefForm')">Edit</button>
+                                        <% } %>
+                                </div>
+                                <div class="card-body">
+                                    <% if (preferences && preferences.is_submitted) { %>
+                                        <div class="pref-grid">
+                                            <div class="pref-item"><span class="pref-label">Sleep Type</span><span
+                                                    class="pref-tag">
+                                                    <%= preferences.sleep_type %>
+                                                </span></div>
+                                            <div class="pref-item"><span class="pref-label">Study Style</span><span
+                                                    class="pref-tag">
+                                                    <%= preferences.study_style %>
+                                                </span></div>
+                                            <div class="pref-item"><span class="pref-label">Noise Tolerance</span><span
+                                                    class="pref-tag">
+                                                    <%= preferences.noise_tolerance %>
+                                                </span></div>
+                                            <div class="pref-item"><span class="pref-label">Cleanliness</span><span
+                                                    class="pref-tag">
+                                                    <%= preferences.cleanliness_level %>
+                                                </span></div>
+                                        </div>
+                                        <div
+                                            style="margin-top:1.25rem;font-size:0.85rem;color:var(--slate-500);font-style:italic;">
+                                            Room preferences are locked after submission.
+                                        </div>
+                                        <% } else { %>
+                                            <p style="color:var(--slate-400);font-size:0.88rem;">No preferences set yet.
+                                                Click Edit to configure.</p>
+                                            <% } %>
+                                                <form id="prefForm" action="/student/preferences" method="POST"
+                                                    class="edit-form" style="display:none;margin-top:1rem;">
+                                                    <div class="form-group"><label class="form-label">Sleep
+                                                            Type</label><select name="sleep_type" class="form-control">
+                                                            <option value="Early Bird"
+                                                                <%=preferences&&preferences.sleep_type==='Early Bird'
+                                                                ?'selected':''%>>Early Bird</option>
+                                                            <option value="Night Owl"
+                                                                <%=preferences&&preferences.sleep_type==='Night Owl'
+                                                                ?'selected':''%>>Night Owl</option>
+                                                        </select></div>
+                                                    <div class="form-group"><label class="form-label">Study
+                                                            Style</label><select name="study_style"
+                                                            class="form-control">
+                                                            <option value="Silent"
+                                                                <%=preferences&&preferences.study_style==='Silent'
+                                                                ?'selected':''%>>Silent</option>
+                                                            <option value="Music"
+                                                                <%=preferences&&preferences.study_style==='Music'
+                                                                ?'selected':''%>>Music</option>
+                                                            <option value="Group"
+                                                                <%=preferences&&preferences.study_style==='Group'
+                                                                ?'selected':''%>>Group</option>
+                                                        </select></div>
+                                                    <div class="form-group"><label class="form-label">Noise
+                                                            Tolerance</label><select name="noise_tolerance"
+                                                            class="form-control">
+                                                            <option value="Low"
+                                                                <%=preferences&&preferences.noise_tolerance==='Low'
+                                                                ?'selected':''%>>Low</option>
+                                                            <option value="Medium"
+                                                                <%=preferences&&preferences.noise_tolerance==='Medium'
+                                                                ?'selected':''%>>Medium</option>
+                                                            <option value="High"
+                                                                <%=preferences&&preferences.noise_tolerance==='High'
+                                                                ?'selected':''%>>High</option>
+                                                        </select></div>
+                                                    <div class="form-group"><label class="form-label">Cleanliness
+                                                            Level</label><select name="cleanliness_level"
+                                                            class="form-control">
+                                                            <option value="Low"
+                                                                <%=preferences&&preferences.cleanliness_level==='Low'
+                                                                ?'selected':''%>>Low</option>
+                                                            <option value="Medium"
+                                                                <%=preferences&&preferences.cleanliness_level==='Medium'
+                                                                ?'selected':''%>>Medium</option>
+                                                            <option value="High"
+                                                                <%=preferences&&preferences.cleanliness_level==='High'
+                                                                ?'selected':''%>>High</option>
+                                                        </select></div>
+                                                    <div class="form-group"><label class="form-label">Preferred Roommate
+                                                            (Student ID)</label><input type="text"
+                                                            name="preferred_roommate"
+                                                            value="<%=preferences?preferences.preferred_roommate||'':''%>"
+                                                            class="form-control" placeholder="e.g. STU2024002"></div>
+                                                    <div class="form-group"><label class="form-label">Conflict List
+                                                            (Student IDs)</label><input type="text" name="conflict_list"
+                                                            value="<%=preferences?preferences.conflict_list||'':''%>"
+                                                            class="form-control"
+                                                            placeholder="e.g. STU2024005,STU2024009"></div>
+                                                    <button type="submit" class="btn btn-primary btn-sm">Save
+                                                        Preferences</button>
+                                                </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ ALLOCATION SECTION ═══════════ -->
+                        <div id="allocation-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Current Room Allocation</h3>
+                            </div>
+                            <div class="card-body">
+                                <% if (allocation) { %>
+                                    <div class="stats-grid"
+                                        style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+                                        <div class="stat-card blue">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Room Number</div>
+                                                    <div class="stat-value">
+                                                        <%= allocation.room_number %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card green">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Capacity</div>
+                                                    <div class="stat-value">
+                                                        <%= allocation.current_occupancy %>/<%= allocation.capacity %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card purple">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Compatibility</div>
+                                                    <div class="stat-value">
+                                                        <%= allocation.compatibility_score.toFixed(1) %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card indigo">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Allocated</div>
+                                                    <div class="stat-value" style="font-size:0.95rem;">
+                                                        <%= new Date(allocation.allocated_at).toLocaleDateString() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } else { %>
+                                        <div style="text-align:center;padding:2rem;color:var(--slate-400);">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                                style="opacity:0.3;margin-bottom:0.75rem;">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <polyline points="12 6 12 12 16 14" />
+                                            </svg>
+                                            <h3 style="color:var(--slate-500);">Room Not Yet Allocated</h3>
+                                            <p style="font-size:0.88rem;">Your room is being assigned. We'll notify you
+                                                once it's ready!</p>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ ROOMMATE DETAILS ═══════════ -->
+                        <div id="roommate-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Roommate Details</h3>
+                            </div>
+                            <div class="card-body">
+                                <% if (allocation && roommates.length> 0) { %>
+                                    <div class="roommate-detail-grid">
+                                        <% for (const mate of roommates) { %>
+                                            <div class="roommate-detail-card">
+                                                <div class="roommate-detail-header">
+                                                    <div class="roommate-detail-avatar">
+                                                        <%= mate.full_name.charAt(0) %>
+                                                    </div>
+                                                    <div class="roommate-detail-info">
+                                                        <div class="roommate-detail-name">
+                                                            <%= mate.full_name %>
+                                                        </div>
+                                                        <div class="roommate-detail-dept">
+                                                            <%= mate.department %> · Year <%= mate.year %>
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        class="roommate-compat-badge <%= mate.percentage >= 70 ? 'high' : mate.percentage >= 40 ? 'mid' : 'low' %>">
+                                                        <%= mate.percentage %>%
+                                                    </span>
+                                                </div>
+                                                <div class="roommate-detail-body">
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Sleep Type</span><span
+                                                            class="pref-tag small">
+                                                            <%= mate.sleep_type || '—' %>
+                                                        </span></div>
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Study Style</span><span
+                                                            class="pref-tag small">
+                                                            <%= mate.study_style || '—' %>
+                                                        </span></div>
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Noise</span><span
+                                                            class="roommate-detail-val">
+                                                            <%= mate.noise_tolerance || '—' %>
+                                                        </span></div>
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Cleanliness</span><span
+                                                            class="roommate-detail-val">
+                                                            <%= mate.cleanliness_level || '—' %>
+                                                        </span></div>
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Email</span><span
+                                                            class="roommate-detail-val text-muted"
+                                                            style="font-size:0.78rem;">
+                                                            <%= mate.email %>
+                                                        </span></div>
+                                                </div>
+                                                <div class="roommate-compat-bar">
+                                                    <div
+                                                        style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">
+                                                        <small
+                                                            style="color:var(--slate-500);">Compatibility</small><small
+                                                            style="font-weight:600;color:var(--slate-700);">
+                                                            <%= mate.percentage %>%
+                                                        </small>
+                                                    </div>
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill"
+                                                            style="width:<%= mate.percentage %>%;background:<%= mate.percentage >= 70 ? 'var(--success)' : mate.percentage >= 40 ? 'var(--warning)' : 'var(--error)' %>;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                    </div>
+                                    <% } else { %>
+                                        <div
+                                            style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                            <%= allocation ? 'No roommates assigned yet.'
+                                                : 'Room allocation required to view roommates.' %>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ ANNOUNCEMENTS ═══════════ -->
+                        <div id="announcements-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Admin Announcements</h3>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                <div class="announcements-scroll-container">
+                                    <% if (!announcements || announcements.length===0) { %>
+                                        <div
+                                            style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                            No recent announcements.
+                                        </div>
+                                        <% } else { %>
+                                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                                <% announcements.forEach(a=> { %>
+                                                    <div
+                                                        style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: 1.25rem;">
+                                                        <div
+                                                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                                                            <div>
+                                                                <h4
+                                                                    style="margin: 0 0 0.25rem 0; color: var(--slate-900); font-size: 1.05rem;">
+                                                                    <%= a.title %>
+                                                                </h4>
+                                                                <div
+                                                                    style="font-size: 0.8rem; color: var(--slate-500);">
+                                                                    <% if (a.admin_name) { %>Posted by <%= a.admin_name
+                                                                            %> •
+                                                                            <% } %>
+                                                                                <% const dt=new Date(a.created_at + 'Z'
+                                                                                    ); const
+                                                                                    fDt=dt.toLocaleString('en-IN', {
+                                                                                    timeZone: 'Asia/Kolkata' ,
+                                                                                    day: '2-digit' , month: '2-digit' ,
+                                                                                    year: 'numeric' , hour: 'numeric' ,
+                                                                                    minute: '2-digit' , hour12: true
+                                                                                    }).toUpperCase(); %>
+                                                                                    <%= fDt %>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <% if (a.priority==='Urgent' ) { %>
+                                                                    <span class="badge badge-danger">Urgent</span>
+                                                                    <% } else if (a.priority==='Important' ) { %>
+                                                                        <span
+                                                                            class="badge badge-warning">Important</span>
+                                                                        <% } else { %>
+                                                                            <span
+                                                                                class="badge badge-primary">Normal</span>
+                                                                            <% } %>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            style="font-size: 0.95rem; color: var(--slate-700); line-height: 1.6; white-space: pre-wrap;">
+                                                            <%= a.message_content %>
+                                                        </div>
+                                                    </div>
+                                                    <% }) %>
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ MESSAGES (Roommate Chat) ═══════════ -->
+                        <div id="messages-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Roommate Messages</h3><span class="badge badge-outline">Auto-deletes in 30
+                                    days</span>
+                            </div>
+                            <div class="card-body">
+                                <% if (!allocation) { %>
+                                    <div
+                                        style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                        Room allocation required to send messages.</div>
+                                    <% } else { %>
+                                        <!-- Chat Area -->
+                                        <div class="chat-area" id="chatArea">
+                                            <% if (messages.length===0) { %>
+                                                <div
+                                                    style="text-align:center;padding:2rem;color:var(--slate-300);font-size:0.85rem;">
+                                                    No messages yet. Say hello to your roommates!</div>
+                                                <% } else { %>
+                                                    <% for (const m of [...messages].reverse()) { %>
+                                                        <div
+                                                            class="chat-msg <%= m.sender_id === user.id ? 'mine' : 'other' %>">
+                                                            <% if (m.sender_id !==user.id) { %>
+                                                                <div class="chat-sender">
+                                                                    <%= m.sender_name %>
+                                                                </div>
+                                                                <% } %>
+                                                                    <div class="chat-bubble">
+                                                                        <%= m.message_text %>
+                                                                    </div>
+                                                                    <div class="chat-time">
+                                                                        <%= m.formatted_time %>
+                                                                    </div>
+                                                        </div>
+                                                        <% } %>
+                                                            <% } %>
+                                        </div>
+                                        <!-- Compose -->
+                                        <form action="/student/send-message" method="POST" class="chat-compose">
+                                            <input type="text" name="message_text" class="form-control"
+                                                placeholder="Type a message to your roommates..." maxlength="300"
+                                                required autocomplete="off">
+                                            <button type="submit" class="btn btn-primary btn-sm">Send</button>
+                                        </form>
+                                        <small class="text-muted" style="margin-top:0.25rem;">Max 300 characters · Only
+                                            roommates can see these messages</small>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ FEE STATUS ═══════════ -->
+                        <div id="fee-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Hostel Fee Status</h3>
+                                <% if (fee) { %><span
+                                        class="badge <%= fee.status === 'Paid' ? 'badge-success' : fee.status === 'Overdue' ? 'badge-danger' : 'badge-warning' %>">
+                                        <%= fee.status %>
+                                    </span>
+                                    <% } %>
+                            </div>
+                            <div class="card-body">
+                                <% if (fee) { %>
+                                    <div class="stats-grid"
+                                        style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));">
+                                        <div class="stat-card blue">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Total Fee</div>
+                                                    <div class="stat-value" style="font-size:1.2rem;">₹<%=
+                                                            fee.total_amount.toLocaleString() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card green">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Paid</div>
+                                                    <div class="stat-value" style="font-size:1.2rem;">₹<%=
+                                                            fee.amount_paid.toLocaleString() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="stat-card <%= (fee.total_amount - fee.amount_paid) > 0 ? 'red' : 'green' %>">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Balance</div>
+                                                    <div class="stat-value" style="font-size:1.2rem;">₹<%=
+                                                            (fee.total_amount - fee.amount_paid).toLocaleString() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stat-card yellow">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-label">Due Date</div>
+                                                    <div class="stat-value" style="font-size:0.95rem;">
+                                                        <%= fee.due_date %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <% if ((fee.total_amount - fee.amount_paid)> 0) { %>
+                                        <div style="margin-top:1.5rem;text-align:right;">
+                                            <button id="payNowBtn" class="btn btn-primary"
+                                                style="display:inline-flex;align-items:center;gap:0.5rem;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                                </svg>
+                                                Pay Now (₹<%= (fee.total_amount - fee.amount_paid).toLocaleString() %>)
+                                            </button>
+                                        </div>
+                                        <% } else if (fee.total_amount> 0) { %>
+                                            <div
+                                                style="margin-top:1.5rem;text-align:right;color:var(--success);font-weight:600;display:flex;align-items:center;justify-content:flex-end;gap:0.5rem;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path d="M22 11.08V12a10 10 10 0 1 1-5.93-9.14" />
+                                                    <polyline points="22 4 12 14.01 9 11.01" />
+                                                </svg>
+                                                Fee Paid in Full
+                                            </div>
+                                            <% } %>
+
+                                                <% if (fee.status==='Overdue' ) { %>
+                                                    <div class="alert alert-danger" style="margin-top:1rem;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2">
+                                                            <circle cx="12" cy="12" r="10" />
+                                                            <line x1="12" y1="8" x2="12" y2="12" />
+                                                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                                                        </svg>
+                                                        Your hostel fee is overdue. Please contact the hostel office
+                                                        immediately.
+                                                    </div>
+                                                    <% } %>
+                                                        <% } else { %>
+                                                            <div
+                                                                style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                                                Fee not set by admin. Please check back later.</div>
+                                                            <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ COMPLAINTS ═══════════ -->
+                        <div id="complaints-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Raise Complaint</h3>
+                                <button class="btn btn-primary btn-sm"
+                                    style="display:flex;align-items:center;gap:0.5rem;"
+                                    onclick="document.getElementById('complaintModal').classList.add('active'); document.body.classList.add('scroll-locked');">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="16" />
+                                        <line x1="8" y1="12" x2="16" y2="12" />
+                                    </svg>
+                                    New Complaint
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <% if (complaints.length===0) { %>
+                                    <div
+                                        style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                        No complaints filed. Use the "New Complaint" button if you have any issues.
+                                    </div>
+                                    <% } else { %>
+                                        <div class="table-container">
+                                            <table class="data-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Type</th>
+                                                        <th>Description</th>
+                                                        <th>Room</th>
+                                                        <th>Status</th>
+                                                        <th>Date</th>
+                                                        <th>Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% for (const c of complaints) { %>
+                                                        <tr>
+                                                            <td><span class="pref-tag">
+                                                                    <%= c.complaint_type %>
+                                                                </span></td>
+                                                            <td style="max-width:250px;font-size:0.85rem;">
+                                                                <%= c.description %>
+                                                            </td>
+                                                            <td>
+                                                                <%= c.room_number || '—' %>
+                                                            </td>
+                                                            <td><span
+                                                                    class="badge <%= c.status === 'Resolved' ? 'badge-success' : c.status === 'Rejected' ? 'badge-danger' : c.status === 'In Review' ? 'badge-info' : 'badge-warning' %>">
+                                                                    <%= c.status %>
+                                                                </span></td>
+                                                            <td><small>
+                                                                    <%= new Date(c.submitted_at).toLocaleDateString() %>
+                                                                </small></td>
+                                                            <td><small class="text-muted">
+                                                                    <%= c.admin_notes || '—' %>
+                                                                </small></td>
+                                                        </tr>
+                                                        <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ REALLOCATION REQUEST ═══════════ -->
+                        <div id="reallocation-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Room Change Request</h3>
+                                <% if (allocation && (!activeRequest || activeRequest.status !=='Pending' )) { %>
+                                    <button class="btn btn-outline btn-sm"
+                                        onclick="document.getElementById('reallocationModal').classList.add('active')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="1 4 1 10 7 10" />
+                                            <polyline points="23 20 23 14 17 14" />
+                                            <path
+                                                d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
+                                        </svg>
+                                        Request Room Change
+                                    </button>
+                                    <% } %>
+                            </div>
+                            <div class="card-body">
+                                <% if (activeRequest) { %>
+                                    <div class="reallocation-status-card">
+                                        <div class="realloc-status-header">
+                                            <div class="realloc-status-icon <%= activeRequest.status.toLowerCase() %>">
+                                                <%= activeRequest.status==='Pending' ? '⏳' :
+                                                    activeRequest.status==='Approved' ? '✅' : '❌' %>
+                                            </div>
+                                            <div>
+                                                <div class="realloc-status-title">Request <span
+                                                        class="badge <%= activeRequest.status === 'Pending' ? 'badge-warning' : activeRequest.status === 'Approved' ? 'badge-success' : 'badge-danger' %>">
+                                                        <%= activeRequest.status %>
+                                                    </span></div>
+                                                <div class="realloc-status-date">Submitted <%= new
+                                                        Date(activeRequest.requested_at).toLocaleDateString() %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="realloc-details">
+                                            <div class="roommate-detail-body">
+                                                <div class="roommate-detail-row"><span
+                                                        class="roommate-detail-label">Current Room</span><span
+                                                        class="roommate-detail-val">
+                                                        <%= activeRequest.room_number || 'N/A' %>
+                                                    </span></div>
+                                                <div class="roommate-detail-row"><span
+                                                        class="roommate-detail-label">Reason</span><span
+                                                        class="roommate-detail-val">
+                                                        <%= activeRequest.reason %>
+                                                    </span></div>
+                                                <% if (activeRequest.comments) { %>
+                                                    <div class="roommate-detail-row"><span
+                                                            class="roommate-detail-label">Comments</span><span
+                                                            class="roommate-detail-val">
+                                                            <%= activeRequest.comments %>
+                                                        </span></div>
+                                                    <% } %>
+                                                        <% if (activeRequest.admin_notes) { %>
+                                                            <div class="roommate-detail-row"><span
+                                                                    class="roommate-detail-label">Admin
+                                                                    Notes</span><span class="roommate-detail-val">
+                                                                    <%= activeRequest.admin_notes %>
+                                                                </span></div>
+                                                            <% } %>
+                                            </div>
+                                            <% if (activeRequest.status==='Pending' ) { %>
+                                                <form action="/student/cancel-reallocation" method="POST"
+                                                    style="margin-top:0.75rem;">
+                                                    <button type="submit" class="btn btn-outline btn-sm"
+                                                        onclick="return confirm('Cancel this request?')">Cancel
+                                                        Request</button>
+                                                </form>
+                                                <% } %>
+                                        </div>
+                                    </div>
+                                    <% } else { %>
+                                        <div
+                                            style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                            <% if (allocation) { %>
+                                                No active room change request. Use the button above to submit one.
+                                                <% } else { %>
+                                                    Room allocation required before requesting a change.
+                                                    <% } %>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ OUTPASS REQUESTS ═══════════ -->
+                        <div id="outpass-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Outpass Requests</h3>
+                                <button class="btn btn-primary btn-sm"
+                                    style="display:flex;align-items:center;gap:0.5rem;"
+                                    onclick="document.getElementById('outpassModal').classList.add('active'); document.body.classList.add('scroll-locked');">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                        <polyline points="16 17 21 12 16 7" />
+                                        <line x1="21" y1="12" x2="9" y2="12" />
+                                    </svg>
+                                    Apply for Outpass
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div style="max-height:350px;overflow-y:auto;overflow-x:hidden;">
+                                    <% if (outpassRequests.length===0) { %>
+                                        <div
+                                            style="text-align:center;padding:2rem;color:var(--slate-400);font-size:0.88rem;">
+                                            No active outpass requests. Use the button above to apply.
+                                        </div>
+                                        <% } else { %>
+                                            <div style="display:flex;flex-direction:column;gap:1rem;">
+                                                <% for (const op of outpassRequests) { %>
+                                                    <div
+                                                        style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--radius-lg);padding:1.25rem;">
+                                                        <div
+                                                            style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+                                                            <div>
+                                                                <div
+                                                                    style="font-weight:600;color:var(--slate-900);font-size:0.95rem;margin-bottom:0.25rem;">
+                                                                    <%= op.reason %>
+                                                                </div>
+                                                                <div style="font-size:0.8rem;color:var(--slate-500);">
+                                                                    Applied: <%= new Date(op.created_at + 'Z'
+                                                                        ).toLocaleString('en-IN', {
+                                                                        timeZone: 'Asia/Kolkata' , day:'2-digit',
+                                                                        month:'2-digit', year:'numeric', hour:'numeric',
+                                                                        minute:'2-digit', hour12:true }).toUpperCase()
+                                                                        %>
+                                                                </div>
+                                                            </div>
+                                                            <span
+                                                                class="badge <%= op.status === 'Approved' ? 'badge-success' : op.status === 'Rejected' ? 'badge-danger' : 'badge-warning' %>">
+                                                                <%= op.status %>
+                                                            </span>
+                                                        </div>
+                                                        <div style="display:flex;gap:1.5rem;margin-bottom:0.5rem;">
+                                                            <div style="font-size:0.85rem;">
+                                                                <span style="color:var(--slate-500);">Out:</span>
+                                                                <strong style="color:var(--slate-700);">
+                                                                    <%= op.out_date %>
+                                                                </strong>
+                                                            </div>
+                                                            <div style="font-size:0.85rem;">
+                                                                <span style="color:var(--slate-500);">Return:</span>
+                                                                <strong style="color:var(--slate-700);">
+                                                                    <%= op.return_date %>
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                        <% if (op.admin_remark) { %>
+                                                            <div
+                                                                style="font-size:0.83rem;color:var(--slate-600);background:var(--slate-100);padding:0.5rem 0.75rem;border-radius:var(--radius-md);margin-top:0.5rem;">
+                                                                <strong>Admin Remark:</strong>
+                                                                <%= op.admin_remark %>
+                                                            </div>
+                                                            <% } %>
+                                                                <% if (op.status==='Pending' ) { %>
+                                                                    <form action="/student/outpass/cancel" method="POST"
+                                                                        style="margin-top:0.75rem;">
+                                                                        <input type="hidden" name="outpass_id"
+                                                                            value="<%= op.id %>">
+                                                                        <button type="submit"
+                                                                            class="btn btn-outline btn-sm"
+                                                                            onclick="return confirm('Cancel this outpass request?')">Cancel
+                                                                            Request</button>
+                                                                    </form>
+                                                                    <% } %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ═══════════ ALLOCATION TIMELINE ═══════════ -->
+                        <div id="timeline-section" class="card" style="margin-bottom:1.5rem;">
+                            <div class="card-header">
+                                <h3>Allocation Timeline</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="allocation-timeline">
+                                    <% for (let i=0; i < timeline.length; i++) { const step=timeline[i]; %>
+                                        <div
+                                            class="timeline-step <%= step.done ? 'completed' : 'pending' %> <%= i === timeline.length - 1 ? 'last' : '' %>">
+                                            <div class="timeline-marker">
+                                                <% if (step.done) { %>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2.5">
+                                                        <polyline points="20 6 9 17 4 12" />
+                                                    </svg>
+                                                    <% } else if (step.icon==='settings' ) { %>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2">
+                                                            <circle cx="12" cy="12" r="3" />
+                                                        </svg>
+                                                        <% } else if (step.icon==='zap' ) { %>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                height="16" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2">
+                                                                <polygon
+                                                                    points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                                            </svg>
+                                                            <% } else if (step.icon==='home' ) { %>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                    height="16" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2">
+                                                                    <path
+                                                                        d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                                                </svg>
+                                                                <% } else if (step.icon==='check-circle' ) { %>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                        height="16" viewBox="0 0 24 24" fill="none"
+                                                                        stroke="currentColor" stroke-width="2">
+                                                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                                                    </svg>
+                                                                    <% } else { %>
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="16" height="16" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2">
+                                                                            <path
+                                                                                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                                            <circle cx="12" cy="7" r="4" />
+                                                                        </svg>
+                                                                        <% } %>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-label">
+                                                    <%= step.label %>
+                                                </div>
+                                                <div class="timeline-date">
+                                                    <% if (step.done && step.date && step.date !=='Completed' ) { %>
+                                                        <%= new Date(step.date).toLocaleDateString() %> <span
+                                                                class="timeline-time">
+                                                                <%= new Date(step.date).toLocaleTimeString([],
+                                                                    {hour:'2-digit', minute:'2-digit'}) %>
+                                                            </span>
+                                                            <% } else if (step.done) { %>
+                                                                Completed
+                                                                <% } else { %>
+                                                                    <span class="pending-text">Awaiting...</span>
+                                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+    </div><!-- content-body -->
+    </main>
+    </div><!-- app-layout -->
+
+    <!-- ═══════════ REALLOCATION MODAL ═══════════ -->
+    <div class="modal-overlay" id="reallocationModal">
+        <div class="modal-content" style="border: none; padding: 0;">
+            <div class="modal-header-dark">
+                <div>
+                    <h3 style="display:flex;align-items:center;">
+                        <div class="modal-icon-bg primary" style="background: rgba(255,255,255,0.1); color: #fff;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
+                            </svg>
+                        </div>
+                        Request Room Change
+                    </h3>
+                    <div class="modal-subtitle">Submit a formal transfer request to administration.</div>
+                </div>
+                <button class="modal-close" style="align-self:flex-start;"
+                    onclick="document.getElementById('reallocationModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">&times;</button>
+            </div>
+            <form action="/student/reallocation-request" method="POST">
+                <div class="modal-body">
+                    <!-- Current Room (read-only) -->
+                    <% if (allocation) { %>
+                        <div class="realloc-grid">
+                            <div style="display:flex;flex-direction:column;gap:0.25rem;">
+                                <div
+                                    style="color:var(--slate-500);font-size:0.8rem;display:flex;align-items:center;gap:0.375rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    Room Number
+                                </div>
+                                <div style="font-size:1.4rem;font-weight:700;color:var(--slate-800);">
+                                    <%= allocation.room_number %>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:0.25rem;">
+                                <div
+                                    style="color:var(--slate-500);font-size:0.8rem;display:flex;align-items:center;gap:0.375rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    Roommates
+                                </div>
+                                <div style="font-size:0.95rem;font-weight:600;color:var(--slate-700);">
+                                    <%= roommates.map(r=> r.full_name).join(', ') || 'None' %>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:0.25rem;">
+                                <div
+                                    style="color:var(--slate-500);font-size:0.8rem;display:flex;align-items:center;gap:0.375rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Allocated Date
+                                </div>
+                                <div style="font-size:0.95rem;font-weight:600;color:var(--slate-700);">
+                                    <%= new Date(allocation.allocated_at).toLocaleDateString() %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <div class="form-group" style="margin-bottom:1.25rem;">
+                                <label class="form-label" style="margin-bottom:0.5rem;">Reason for Request <span
+                                        style="color:var(--error);">*</span></label>
+                                <select name="reason" class="form-control" style="border-radius:var(--radius-md);"
+                                    required>
+                                    <option value="">Select a reason...</option>
+                                    <option value="Conflict with roommate">Conflict with roommate</option>
+                                    <option value="Health issue">Health issue</option>
+                                    <option value="Study preference mismatch">Study preference mismatch</option>
+                                    <option value="Personal reason">Personal reason</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label" style="margin-bottom:0.5rem;">Additional Comments</label>
+                                <textarea name="comments" class="form-control" rows="3"
+                                    style="border-radius:var(--radius-md);"
+                                    placeholder="Provide any additional details..." maxlength="500"></textarea>
+                            </div>
+                            <div class="modal-alert-box">
+                                <div
+                                    style="background:#FDE68A;color:#B45309;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <path
+                                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                        <line x1="12" y1="9" x2="12" y2="13" />
+                                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <strong
+                                        style="font-weight:600;color:#92400e;display:block;margin-bottom:0.15rem;">Admin
+                                        Review Required:</strong> <span style="font-size:0.85rem;">Reallocation requests
+                                        will be reviewed by
+                                        administration. Approval is not guaranteed and
+                                        may take several business days.</span>
+                                </div>
+                            </div>
+                </div>
+                <div class="modal-footer"
+                    style="padding:1.25rem 1.5rem;background:white;border-top:1px solid var(--slate-100);">
+                    <button type="button" class="btn btn-outline btn-sm"
+                        style="border-color:var(--slate-200);color:var(--slate-600);"
+                        onclick="document.getElementById('reallocationModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm"
+                        style="box-shadow:0 4px 12px rgba(79,70,229,0.3);padding:0.5rem 1.25rem;">Submit
+                        Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════ COMPLAINT MODAL ═══════════ -->
+    <div class="modal-overlay" id="complaintModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h3 style="display:flex;align-items:center;">
+                        <div class="modal-icon-bg error">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                        </div>
+                        Report an Issue
+                    </h3>
+                    <div style="font-size:0.85rem;color:var(--slate-500);margin-top:0.25rem;margin-left:3.2rem;">Help us
+                        resolve your concern quickly.</div>
+                </div>
+                <button class="modal-close" style="align-self:flex-start;"
+                    onclick="document.getElementById('complaintModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">&times;</button>
+            </div>
+            <form action="/student/complaint" method="POST">
+                <div class="modal-body">
+                    <div class="modal-input-wrapper">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Complaint Type <span style="color:var(--error);">*</span></label>
+                            <select name="complaint_type" class="form-control" required>
+                                <option value="">Select type...</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Roommate Issue">Roommate Issue</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Plumbing">Plumbing</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-input-wrapper" style="margin-bottom:0;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Description <span style="color:var(--error);">*</span></label>
+                            <textarea name="description" class="form-control" rows="5"
+                                placeholder="Describe the issue in detail..." required maxlength="1000"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline btn-sm"
+                        onclick="document.getElementById('complaintModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Submit Complaint</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════ OUTPASS MODAL ═══════════ -->
+    <div class="modal-overlay" id="outpassModal">
+        <div class="modal-content" style="border: none; padding: 0;">
+            <div class="modal-header-dark">
+                <div>
+                    <h3 style="display:flex;align-items:center;">
+                        <div class="modal-icon-bg primary" style="background: rgba(255,255,255,0.1); color: #fff;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                        </div>
+                        Apply for Outpass
+                    </h3>
+                    <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0;">Request expires after 7 days</p>
+                </div>
+                <button class="modal-close-btn"
+                    onclick="document.getElementById('outpassModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <form action="/student/outpass/apply" method="POST">
+                <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+                    <div class="modal-input-wrapper">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Reason <span style="color:var(--error);">*</span></label>
+                            <textarea name="reason" class="form-control" rows="4"
+                                placeholder="Why do you need an outpass?" required maxlength="500"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-input-wrapper" style="display:flex;gap:1rem;">
+                        <div class="form-group" style="margin-bottom:0;flex:1;">
+                            <label class="form-label">Out Date <span style="color:var(--error);">*</span></label>
+                            <input type="date" name="out_date" class="form-control" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;">
+                            <label class="form-label">Return Date <span style="color:var(--error);">*</span></label>
+                            <input type="date" name="return_date" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline btn-sm"
+                        onclick="document.getElementById('outpassModal').classList.remove('active'); document.body.classList.remove('scroll-locked');">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Submit Outpass</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+        function toggleEdit(id) {
+            const f = document.getElementById(id);
+            f.style.display = f.style.display === 'none' ? 'block' : 'none';
+        }
+        function scrollToSection(e, id) {
+            e.preventDefault();
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Notification Bell
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notifPanel');
+            const overlay = document.getElementById('notifOverlay');
+            const isOpen = panel.style.display === 'block';
+
+            panel.style.display = isOpen ? 'none' : 'block';
+            if (isOpen) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function markNotifRead() {
+            fetch('/student/notifications/read', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .then(() => { location.reload(); });
+        }
+        // Close notif panel on outside click
+        document.addEventListener('click', function (e) {
+            const wrapper = document.querySelector('.notif-bell-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('notifPanel').style.display = 'none';
+                document.getElementById('notifOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Toast auto-dismiss
+        const toast = document.getElementById('toastAlert');
+        if (toast) { setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-10px)'; setTimeout(() => toast.remove(), 400); }, 5000); }
+
+        // Auto-scroll chat
+        const chatArea = document.getElementById('chatArea');
+        if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+
+        // Allocation polling (if not allocated)
+        <% if (!allocation) { %>
+            setInterval(() => {
+                fetch('/student/allocation-status').then(r => r.json()).then(d => { if (d.allocated) location.reload(); });
+            }, 10000);
+        <% } %>
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const RZP_KEY = "<%= typeof razorpayKeyId !== 'undefined' ? razorpayKeyId : '' %>";
+
+        // ══════════════════════════════════════════════════════════
+        //  PAYMENTS (Razorpay)
+        // ══════════════════════════════════════════════════════════
+        const payNowBtn = document.getElementById('payNowBtn');
+        if (payNowBtn) {
+            payNowBtn.addEventListener('click', async () => {
+                try {
+                    payNowBtn.disabled = true;
+                    payNowBtn.innerHTML = 'Processing...';
+
+                    // 1. Create Order
+                    const res = await fetch('/student/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        alert(data.error || 'Failed to create order');
+                        payNowBtn.disabled = false;
+                        payNowBtn.innerHTML = 'Pay Now';
+                        return;
+                    }
+
+                    // 2. Initialize Razorpay
+                    const options = {
+                        key: RZP_KEY,
+                        amount: data.order.amount,
+                        currency: "INR",
+                        name: "Hostel Room Allocator",
+                        description: "Hostel Fee Payment",
+                        order_id: data.order.id,
+                        prefill: {
+                            name: "<%= user.full_name %>",
+                            email: "<%= user.email %>"
+                        },
+                        handler: async function (response) {
+                            // 3. Verify Payment
+                            try {
+                                const verifyRes = await fetch('/student/verify-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    })
+                                });
+                                const verifyData = await verifyRes.json();
+
+                                if (verifyRes.ok && verifyData.success) {
+                                    alert('Payment successful!');
+                                    window.location.reload();
+                                } else {
+                                    alert('Payment verification failed: ' + (verifyData.error || 'Unknown error'));
+                                    payNowBtn.disabled = false;
+                                    payNowBtn.innerHTML = 'Pay Now';
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                alert('Error verifying payment');
+                                payNowBtn.disabled = false;
+                                payNowBtn.innerHTML = 'Pay Now';
+                            }
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                payNowBtn.disabled = false;
+                                payNowBtn.innerHTML = 'Pay Now';
+                            }
+                        },
+                        theme: { color: "#3b82f6" }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function (response) {
+                        alert("Payment failed. Please try again.");
+                        payNowBtn.disabled = false;
+                        payNowBtn.innerHTML = 'Pay Now';
+                    });
+                    rzp.open();
+                } catch (error) {
+                    console.error('Payment Error:', error);
+                    alert('An error occurred. Please try again later.');
+                    payNowBtn.disabled = false;
+                    payNowBtn.innerHTML = 'Pay Now';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
