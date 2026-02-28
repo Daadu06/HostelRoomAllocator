@@ -2,7 +2,10 @@ const initSqlJs = require('sql.js');
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = path.join(__dirname, '..', 'data', 'hostel.db');
+const isVercel = process.env.VERCEL === '1';
+const dbPath = isVercel
+  ? path.join('/tmp', 'hostel.db')
+  : path.join(__dirname, '..', 'data', 'hostel.db');
 const dataDir = path.dirname(dbPath);
 
 // Ensure data directory exists
